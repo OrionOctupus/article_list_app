@@ -36,47 +36,6 @@ class App extends React.Component {
 
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
-  };
-
-  class Search extends React.Component {
-    render() {
-      const {value, onChange} = this.props;
-      return (
-        <form>  
-          <input 
-            type='text'
-            value={searchTerm}
-            onChange = {this.onSearchChange} />
-        </form>
-      );
-    }
-  }
-
-  class Table extends React.Component {
-    render() {
-      const { list, patern, onDismiss} = this.props;
-      return (
-        <div>
-          {list.filter(isSearched(searchTerm)).map(item =>
-            <div key={item.objectID}> 
-              <span>
-                <a href={item.url}>{item.title}</a>
-              </span>
-              <span> {item.author} </span>
-              <span> {item.num_comments}</span>
-              <span> {item.points}</span>
-              <span>
-                <button
-                  onClick={() => this.onDismiss(item.objectID)}
-                  type="button"
-                >
-                  Отбросить
-                </button>
-              </span>
-            </div>
-        </div>
-      );
-    }
   }
 
   onSearchChange(event) {
@@ -95,18 +54,33 @@ class App extends React.Component {
   }
 
   render() {
-    
+    const {searchTerm, list} = this.state;
      return (
       <div className="App">
-        <Search
-        value={searchTerm}
-        onChange = {this.onSearchChange} />
-        />
-        <Table
-        list={list}
-        patern = {searchTerm}
-        onChange = {this.onDismiss}
-        />
+        <form>  
+          <input 
+            type='text'
+            value={searchTerm}
+            onChange = {this.onSearchChange} />
+        </form>
+          {list.filter(isSearched(searchTerm)).map(item =>
+            <div key={item.objectID}> 
+              <span>
+                <a href={item.url}>{item.title}</a>
+              </span>
+              <span> {item.author} </span>
+              <span> {item.num_comments}</span>
+              <span> {item.points}</span>
+              <span>
+                <button
+                  onClick={() => this.onDismiss(item.objectID)}
+                  type="button"
+                >
+                  Отбросить
+                </button>
+              </span>
+            </div>
+        )}
       </div>
     );
   }
