@@ -63,13 +63,15 @@ class App extends React.Component {
   render() {
     const {searchTerm, list} = this.state;
      return (
-      <div className="App">
-        <Search
-          value={searchTerm}
-          onChange = {this.onSearchChange} 
-        >
-          Поиск
-        </Search>
+      <div className="page">
+        <div className="interactions">
+          <Search
+            value={searchTerm}
+            onChange = {this.onSearchChange} 
+          >
+            Поиск
+          </Search>
+        </div>
         <Table
           list={list}
           pattern = {searchTerm}
@@ -81,7 +83,7 @@ class App extends React.Component {
 }
 
   // компонент поиск
-// преобразованный в функцию
+// преобразованный в функциональный компонент без состояния ()
 function Search(props){
   const { value, onChange, children } = props;
   return (
@@ -100,17 +102,23 @@ function Search(props){
 
 const Table = ({ list, pattern, onDismiss }) => {
     return (
-      <div>
+      <div className="table">
         {list.filter(isSearched(pattern)).map(item =>
-          <div key={item.objectID}>
-            <span>
+          <div className="table-row" key={item.objectID}>
+            <span style={{width: '40%'}}>
               <a href={item.url}>{item.title}</a>
             </span>
-            <span> {item.author} </span>
-            <span> {item.num_comments}</span>
-            <span> {item.points}</span>
-            <span>
-              <Button onClick={() => onDismiss(item.objectID)}>
+            <span style={{width: '30%'}}>
+              {item.author}
+            </span>
+            <span style={{width: '10%'}}>
+             {item.num_comments}
+            </span>
+            <span style={{width: '10%'}}>
+              {item.points}
+            </span>
+            <span style={{width: '10%'}}>
+              <Button className="button-inline" onClick={() => onDismiss(item.objectID)}>
                 Удалить
               </Button>
             </span>
@@ -128,5 +136,5 @@ const Button = ({onClick, className='', children}) =>
   >
     {children}
   </button>
-  
+
 export default App;
