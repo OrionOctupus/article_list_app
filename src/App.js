@@ -53,21 +53,34 @@ class App extends React.Component {
       searchTerm: DEFAULT_QUERY,
     };
 
-    this.setSearchTopStories = this.setSearchTopStories.bind(this); this.onSearchChange.bind(this);
+    this.onSearchSubmit = this.onSearchSubmit.bind(this);
+    this.setSearchTopStories = this.setSearchTopStories.bind(this); 
+    this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
+  }
+
+
+  onSearchSubmit(event) {
+    const {searchTerm} = this.state;
+    this.fetchSearchTopStories(searchTerm);
+    event.preventDefault();
   }
 
   setSearchTopStories(result) {
     this.setState({result});
   }
 
-  componentDidMount() {
-    const {searchTerm} = this.state;
-
+  fetchSearchTopStories(searchTerm) {
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${DEFAULT_QUERY}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
       .catch(error => error);
+  }
+
+  componentDidMount() {
+    const {searchTerm} = this.state;
+    this.fetchSearchTopStories(searchTerm);
   } 
 
   onSearchChange(event) {
@@ -97,16 +110,19 @@ class App extends React.Component {
         <div className="interactions">
           <Search
             value={searchTerm}
-            onChange = {this.onSearchChange} 
+            onChange = {this.onSearchChange}
+            onSubmit = {this.onSearchSubmit} 
           >
             Поиск
           </Search>
         </div>
-        <Table
+        { result 
+        ? <Table
           list={result.hits}
-          pattern = {searchTerm}
           onDismiss = {this.onDismiss}
         />
+        : null
+        }   
       </div>
     );
   }
@@ -115,14 +131,17 @@ class App extends React.Component {
   // компонент поиск
 // преобразованный в функциональный компонент без состояния ()
 function Search(props){
-  const { value, onChange, children } = props;
+  const { value, onChange, onSubmit, children } = props;
   return (
-    <form>
-      {children} <input
+    <form onSubmit = {onSubmit}>
+      <input
         type='text'
         value={value}
         onChange={onChange}
       />
+      <button type="submit">
+        {children}
+      </button>
     </form>
   );
 }
@@ -130,10 +149,10 @@ function Search(props){
 // компонент данных
 // преобразованный в стрелочную функцию
 
-const Table = ({ list, pattern, onDismiss }) => {
+const Table = ({ list, onDismiss }) => {
     return (
       <div className="table">
-        {list.filter(isSearched(pattern)).map(item =>
+        {list.map(item =>
           <div className="table-row" key={item.objectID}>
             <span style={{width: '40%'}}>
               <a href={item.url}>{item.title}</a>
