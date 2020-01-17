@@ -80,28 +80,25 @@ class App extends React.Component {
   }
 }
 
-  // коспонент поиск
-
-class Search extends React.Component {
-  render() {
-    const { value, onChange, children } = this.props;
-    return (
-      <form>
-        {children} <input
-          type='text'
-          value={value}
-          onChange={onChange}
-        />
-      </form>
-    );
-  }
+  // компонент поиск
+// преобразованный в функцию
+function Search(props){
+  const { value, onChange, children } = props;
+  return (
+    <form>
+      {children} <input
+        type='text'
+        value={value}
+        onChange={onChange}
+      />
+    </form>
+  );
 }
 
 // компонент данных
+// преобразованный в стрелочную функцию
 
-class Table extends React.Component {
-  render() {
-    const { list, pattern, onDismiss } = this.props;
+const Table = ({ list, pattern, onDismiss }) => {
     return (
       <div>
         {list.filter(isSearched(pattern)).map(item =>
@@ -120,21 +117,16 @@ class Table extends React.Component {
           </div>)}
       </div>
     );
-  }
 }
 
-class Button extends React.Component {
-  render() {
-    const {onClick, className='', children} = this.props;
-    return (
-      <button
-        onClick = {onClick}
-        className={className}
-        type='button'
-      >
-        {children}
-      </button>
-    );
-  }
-}
+// компонент кнопка преобразован в стрелочную функцию и сокращен return 
+const Button = ({onClick, className='', children}) =>
+  <button
+    onClick={onClick}
+    className={className}
+    type='button'
+  >
+    {children}
+  </button>
+  
 export default App;
