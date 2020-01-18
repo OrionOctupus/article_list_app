@@ -56,6 +56,7 @@ class App extends React.Component {
       results: null,
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
+      error: null,
     };
 
     this.ToSearchTopStories = this.needsToSearchTopStories.bind(this);
@@ -114,12 +115,10 @@ class App extends React.Component {
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
-      .catch(error => error);
+      .catch(error => this.setState({error}));
   }
 
   componentDidMount() {
-
-
     const {searchTerm} = this.state;
     this.setState({searchKey: searchTerm});
     this.fetchSearchTopStories(searchTerm);
@@ -137,7 +136,7 @@ class App extends React.Component {
     console.log('сработала onDismiss');
 
     const {searchKey, results} = this.state;
-    const {hits,page} = results[searchKey];
+    const {hits, page} = results[searchKey];
 
     function isNotId(item) {
       return item.objectID !== id;
@@ -155,9 +154,13 @@ class App extends React.Component {
   render() {
     console.log('этот state');
     console.log(this.state);
-    const {searchTerm, results, searchKey} = this.state;
+    const {searchTerm, results, searchKey, error} = this.state;
     const page = (results&&results[searchKey]&&results[searchKey].page) || 0;
     const list = (results&&results[searchKey]&&results[searchKey].hits) || [];
+
+    // if(error) {
+    //   return <p>Что-то пошло не так</p> 
+    // }
      return (
       <div className="page">
         <div className="interactions">
@@ -170,11 +173,16 @@ class App extends React.Component {
           </Search>
         </div>
         
-        <Table
+        { error
+          ? <div className="interactions">
+            <p>Что то пошло не так</p>
+          </div>
+          :  <Table
           list={list}
           onDismiss = {this.onDismiss}
         />
-           
+        }
+
         <div className="interactions">
           <Button onClick={() => this.fetchSearchTopStories(searchTerm, page+1)}>
             Больше истории
