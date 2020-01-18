@@ -36,11 +36,11 @@ console.log(url);
 
 // функция поиска
 
-function isSearched(searchTerm) {
-  return function(item) {
-    return item.title.toLowerCase().includes(searchTerm.toLowerCase());
-  }
-}
+// function isSearched(searchTerm) {
+//   return function(item) {
+//     return item.title.toLowerCase().includes(searchTerm.toLowerCase());
+//   }
+// }
 
 // компоненты
 
@@ -53,10 +53,12 @@ class App extends React.Component {
     //   searchTerm: '',
     // };
     this.state = {
-      result: null,
+      results: null,
+      searchKey: '',
       searchTerm: DEFAULT_QUERY,
     };
 
+    this.ToSearchTopStories = this.needsToSearchTopStories.bind(this);
     this.onSearchSubmit = this.onSearchSubmit.bind(this);
     this.setSearchTopStories = this.setSearchTopStories.bind(this); 
     this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
@@ -65,17 +67,31 @@ class App extends React.Component {
   }
 
 
+  needsToSearchTopStories(searchTerm) {
+    console.log('сработала needsToSearchTopStories');
+    return !this.state.results[searchTerm];
+  }
+
   onSearchSubmit(event) {
+    console.log('сработала noSearchSubmit');
     const {searchTerm} = this.state;
+    this.setState({searchKey: searchTerm});
     this.fetchSearchTopStories(searchTerm);
+
+    if(this.needsToSearchTopStories(searchTerm)) {
+      this.fetchSearchTopStories(searchTerm);
+    }
+
     event.preventDefault();
   }
 
   setSearchTopStories(result) {
+    console.log('сработала setSearchTopStories');
     const {hits, page} = result;
+    const {searchKey, results} = this.state;
 
-    const oldHits = page !==0
-      ? this.state.result.hits
+    const oldHits = results && results[searchKey]
+      ? results[searchKey].hits
       : [];
 
       const updateHits = [
@@ -84,11 +100,17 @@ class App extends React.Component {
       ];
 
       this.setState({
-        result: {hits: updateHits, page}
+        results:{
+          ...results,
+          [searchKey]: {hits: updateHits, page}
+        } 
       });
   }
 
   fetchSearchTopStories(searchTerm, page = 0) {
+    console.log('сработала fetchSearchTopStories');
+
+
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
@@ -96,33 +118,46 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+
+
     const {searchTerm} = this.state;
+    this.setState({searchKey: searchTerm});
     this.fetchSearchTopStories(searchTerm);
   } 
 
   onSearchChange(event) {
+    console.log('сработала onSearchChange');
+
     this.setState({ searchTerm: event.target.value});
     console.warn(event.target.value);
   }
 
   onDismiss(id) {
     console.log(id);
+    console.log('сработала onDismiss');
+
+    const {searchKey, results} = this.state;
+    const {hits,page} = results[searchKey];
+
     function isNotId(item) {
       return item.objectID !== id;
     };
 
-    const updateHits = this.state.result.hits.filter(isNotId);
+    const updateHits = this.filter(isNotId);
     this.setState({
-      result: { ...this.state.rusult, hits: updateHits}
+      results: {
+        ...results,
+        [searchKey]: {hits: updateHits, page}
+      } 
     });
   }
 
   render() {
     console.log('этот state');
     console.log(this.state);
-    const {searchTerm, result} = this.state;
-    const page = (result&&result.page) || 0;
-    
+    const {searchTerm, results, searchKey} = this.state;
+    const page = (results&&results[searchKey]&&results[searchKey].page) || 0;
+    const list = (results&&results[searchKey]&&results[searchKey].hits) || [];
      return (
       <div className="page">
         <div className="interactions">
@@ -134,13 +169,12 @@ class App extends React.Component {
             Поиск
           </Search>
         </div>
-        { result 
-        ? <Table
-          list={result.hits}
+        
+        <Table
+          list={list}
           onDismiss = {this.onDismiss}
         />
-        : null
-        }   
+           
         <div className="interactions">
           <Button onClick={() => this.fetchSearchTopStories(searchTerm, page+1)}>
             Больше истории
