@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import axios from 'axios';
 
 
 const DEFAULT_QUERY = 'redux';
@@ -45,6 +46,8 @@ console.log(url);
 // компоненты
 
 class App extends React.Component {
+  _isMounded = false;
+
   constructor(props) {
     super(props);
 
@@ -112,17 +115,28 @@ class App extends React.Component {
     console.log('сработала fetchSearchTopStories');
 
 
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
-      .then(response => response.json())
-      .then(result => this.setSearchTopStories(result))
-      .catch(error => this.setState({error}));
+    axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
+      .then(result => this._isMounded && this.setSearchTopStories(result.data)) 
+      .catch(error => this._isMounded && this.setState({error}));
+
+      // fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
+      // .then(response => response.json())
+      // .then(result => this.setSearchTopStories(result))
+      // .catch(error => this.setState({error}));
   }
 
   componentDidMount() {
+    this._isMounded = true;
+
     const {searchTerm} = this.state;
     this.setState({searchKey: searchTerm});
     this.fetchSearchTopStories(searchTerm);
   } 
+
+  componentWillUnmount() {
+    this._isMounded = false;
+
+  }
 
   onSearchChange(event) {
     console.log('сработала onSearchChange');
@@ -136,20 +150,22 @@ class App extends React.Component {
     console.log('сработала onDismiss');
 
     const {searchKey, results} = this.state;
-    const {hits, page} = results[searchKey];
+    const { hits, page} = results[searchKey];
 
     function isNotId(item) {
       return item.objectID !== id;
     };
 
-    const updateHits = this.filter(isNotId);
+    const updateHits = hits.filter(isNotId);
+
     this.setState({
       results: {
         ...results,
-        [searchKey]: {hits: updateHits, page}
+        [searchKey]: { hits: updateHits, page}
       } 
     });
   }
+
 
   render() {
     console.log('этот state');
