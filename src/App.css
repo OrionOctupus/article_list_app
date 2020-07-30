@@ -60,3 +60,7 @@
   border-radius:0;
   border-bottom:1px solid #38bb6c;
 }
+
+.delete:hover {
+  color:#f00;
+}

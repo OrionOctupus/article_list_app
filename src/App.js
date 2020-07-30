@@ -64,7 +64,7 @@ class App extends React.Component {
 
     this.ToSearchTopStories = this.needsToSearchTopStories.bind(this);
     this.onSearchSubmit = this.onSearchSubmit.bind(this);
-    this.setSearchTopStories = this.setSearchTopStories.bind(this); 
+    this.setSearchTopStories = this.setSearchTopStories.bind(this);
     this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
@@ -78,11 +78,11 @@ class App extends React.Component {
 
   onSearchSubmit(event) {
     console.log('сработала noSearchSubmit');
-    const {searchTerm} = this.state;
-    this.setState({searchKey: searchTerm});
+    const { searchTerm } = this.state;
+    this.setState({ searchKey: searchTerm });
     this.fetchSearchTopStories(searchTerm);
 
-    if(this.needsToSearchTopStories(searchTerm)) {
+    if (this.needsToSearchTopStories(searchTerm)) {
       this.fetchSearchTopStories(searchTerm);
     }
 
@@ -91,24 +91,24 @@ class App extends React.Component {
 
   setSearchTopStories(result) {
     console.log('сработала setSearchTopStories');
-    const {hits, page} = result;
-    const {searchKey, results} = this.state;
+    const { hits, page } = result;
+    const { searchKey, results } = this.state;
 
     const oldHits = results && results[searchKey]
       ? results[searchKey].hits
       : [];
 
-      const updateHits = [
-        ...oldHits,
-        ...hits
-      ];
+    const updateHits = [
+      ...oldHits,
+      ...hits
+    ];
 
-      this.setState({
-        results:{
-          ...results,
-          [searchKey]: {hits: updateHits, page}
-        } 
-      });
+    this.setState({
+      results: {
+        ...results,
+        [searchKey]: { hits: updateHits, page }
+      }
+    });
   }
 
   fetchSearchTopStories(searchTerm, page = 0) {
@@ -116,22 +116,22 @@ class App extends React.Component {
 
 
     axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
-      .then(result => this._isMounded && this.setSearchTopStories(result.data)) 
-      .catch(error => this._isMounded && this.setState({error}));
+      .then(result => this._isMounded && this.setSearchTopStories(result.data))
+      .catch(error => this._isMounded && this.setState({ error }));
 
-      // fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
-      // .then(response => response.json())
-      // .then(result => this.setSearchTopStories(result))
-      // .catch(error => this.setState({error}));
+    // fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
+    // .then(response => response.json())
+    // .then(result => this.setSearchTopStories(result))
+    // .catch(error => this.setState({error}));
   }
 
   componentDidMount() {
     this._isMounded = true;
 
-    const {searchTerm} = this.state;
-    this.setState({searchKey: searchTerm});
+    const { searchTerm } = this.state;
+    this.setState({ searchKey: searchTerm });
     this.fetchSearchTopStories(searchTerm);
-  } 
+  }
 
   componentWillUnmount() {
     this._isMounded = false;
@@ -141,7 +141,7 @@ class App extends React.Component {
   onSearchChange(event) {
     console.log('сработала onSearchChange');
 
-    this.setState({ searchTerm: event.target.value});
+    this.setState({ searchTerm: event.target.value });
     console.warn(event.target.value);
   }
 
@@ -149,8 +149,8 @@ class App extends React.Component {
     console.log(id);
     console.log('сработала onDismiss');
 
-    const {searchKey, results} = this.state;
-    const { hits, page} = results[searchKey];
+    const { searchKey, results } = this.state;
+    const { hits, page } = results[searchKey];
 
     function isNotId(item) {
       return item.objectID !== id;
@@ -161,8 +161,8 @@ class App extends React.Component {
     this.setState({
       results: {
         ...results,
-        [searchKey]: { hits: updateHits, page}
-      } 
+        [searchKey]: { hits: updateHits, page }
+      }
     });
   }
 
@@ -170,37 +170,34 @@ class App extends React.Component {
   render() {
     console.log('этот state');
     console.log(this.state);
-    const {searchTerm, results, searchKey, error} = this.state;
-    const page = (results&&results[searchKey]&&results[searchKey].page) || 0;
-    const list = (results&&results[searchKey]&&results[searchKey].hits) || [];
+    const { searchTerm, results, searchKey, error } = this.state;
+    const page = (results && results[searchKey] && results[searchKey].page) || 0;
+    const list = (results && results[searchKey] && results[searchKey].hits) || [];
 
-    // if(error) {
-    //   return <p>Что-то пошло не так</p> 
-    // }
-     return (
+    return (
       <div className="page">
         <div className="interactions">
           <Search
             value={searchTerm}
-            onChange = {this.onSearchChange}
-            onSubmit = {this.onSearchSubmit} 
+            onChange={this.onSearchChange}
+            onSubmit={this.onSearchSubmit}
           >
             Поиск
           </Search>
         </div>
-        
-        { error
+
+        {error
           ? <div className="interactions">
             <p>Что то пошло не так</p>
           </div>
-          :  <Table
-          list={list}
-          onDismiss = {this.onDismiss}
-        />
+          : <Table
+            list={list}
+            onDismiss={this.onDismiss}
+          />
         }
 
         <div className="interactions">
-          <Button onClick={() => this.fetchSearchTopStories(searchTerm, page+1)}>
+          <Button onClick={() => this.fetchSearchTopStories(searchTerm, page + 1)}>
             Больше истории
           </Button>
         </div>
@@ -209,12 +206,12 @@ class App extends React.Component {
   }
 }
 
-  // компонент поиск
+// компонент поиск
 // преобразованный в функциональный компонент без состояния ()
-function Search(props){
+function Search(props) {
   const { value, onChange, onSubmit, children } = props;
   return (
-    <form onSubmit = {onSubmit}>
+    <form onSubmit={onSubmit}>
       <input
         type='text'
         value={value}
@@ -231,34 +228,49 @@ function Search(props){
 // преобразованный в стрелочную функцию
 
 const Table = ({ list, onDismiss }) => {
-    return (
-      <div className="table">
-        {list.map(item =>
-          <div className="table-row" key={item.objectID}>
-            <span style={{width: '40%'}}>
-              <a href={item.url}>{item.title}</a>
+  return (
+    <div className="table">
+      <div className="table-header" >
+        <span style={{ width: '40%' }}>
+          title
             </span>
-            <span style={{width: '30%'}}>
-              {item.author}
+        <span style={{ width: '30%' }}>
+          author
             </span>
-            <span style={{width: '10%'}}>
-             {item.num_comments}
+        <span style={{ width: '10%' }}>
+          comments
             </span>
-            <span style={{width: '10%'}}>
-              {item.points}
+        <span style={{ width: '10%' }}>
+          points
             </span>
-            <span style={{width: '10%'}}>
-              <Button className="button-inline" onClick={() => onDismiss(item.objectID)}>
-                Удалить
-              </Button>
-            </span>
-          </div>)}
+        <span style={{ width: '10%' }}></span>
       </div>
-    );
+      {list.map(item =>
+        <div className="table-row" key={item.objectID}>
+          <span style={{ width: '40%' }}>
+            <a href={item.url}>{item.title}</a>
+          </span>
+          <span style={{ width: '30%' }}>
+            {item.author}
+          </span>
+          <span style={{ width: '10%' }}>
+            {item.num_comments}
+          </span>
+          <span style={{ width: '10%' }}>
+            {item.points}
+          </span>
+          <span style={{ width: '10%' }}>
+            <Button className=" delete" onClick={() => onDismiss(item.objectID)}>
+              Удалить
+              </Button>
+          </span>
+        </div>)}
+    </div>
+  );
 }
 
 // компонент кнопка преобразован в стрелочную функцию и сокращен return 
-const Button = ({onClick, className='', children}) =>
+const Button = ({ onClick, className = '', children }) =>
   <button
     onClick={onClick}
     className={className}
